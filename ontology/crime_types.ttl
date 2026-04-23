@@ -1,0 +1,63 @@
+@prefix crime: <http://interior-minister.gub.uy/ontology/crime#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+# Classes
+crime:Incident a owl:Class ;
+    rdfs:label "Crime Incident" ;
+    rdfs:comment "A reported crime event" .
+
+crime:Person a owl:Class ;
+    rdfs:label "Person" ;
+    rdfs:comment "A person involved in a crime (victim or offender)" .
+
+crime:CrimeType a owl:Class ;
+    rdfs:label "Crime Type" ;
+    rdfs:comment "Classification of criminal offense" .
+
+crime:TimePeriod a owl:Class ;
+    rdfs:label "Time Period" ;
+    rdfs:comment "Temporal reference (year, month, quarter)" .
+
+# Crime type instances
+crime:Homicidio a crime:CrimeType ; rdfs:label "Homicidio doloso" .
+crime:Rapina a crime:CrimeType ; rdfs:label "Rapiña" .
+crime:Hurto a crime:CrimeType ; rdfs:label "Hurto" .
+crime:Lesiones a crime:CrimeType ; rdfs:label "Lesiones" .
+crime:ViolenciaDomestica a crime:CrimeType ; rdfs:label "Violencia doméstica" .
+crime:Abigeato a crime:CrimeType ; rdfs:label "Abigeato" .
+crime:DelitoSexual a crime:CrimeType ; rdfs:label "Delito sexual" .
+crime:AbusoSexual a crime:CrimeType ; rdfs:label "Abuso sexual" .
+crime:Violacion a crime:CrimeType ; rdfs:label "Violación" .
+
+# Properties
+crime:crimeType a owl:ObjectProperty ;
+    rdfs:domain crime:Incident ;
+    rdfs:range crime:CrimeType .
+
+crime:reportedAt a owl:ObjectProperty ;
+    rdfs:domain crime:Incident .
+
+crime:victimOf a owl:ObjectProperty ;
+    rdfs:domain crime:Person ;
+    rdfs:range crime:Incident .
+
+crime:offenderIn a owl:ObjectProperty ;
+    rdfs:domain crime:Person ;
+    rdfs:range crime:Incident .
+
+crime:classifiedAs a owl:ObjectProperty ;
+    rdfs:domain crime:Incident ;
+    rdfs:range crime:CrimeType .
+
+crime:year a owl:DatatypeProperty ;
+    rdfs:domain crime:Incident .
+
+crime:month a owl:DatatypeProperty ;
+    rdfs:domain crime:Incident .
+
+crime:sex a owl:DatatypeProperty ;
+    rdfs:domain crime:Person .
+
+crime:role a owl:DatatypeProperty ;
+    rdfs:domain crime:Person .

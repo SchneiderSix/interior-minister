@@ -1,0 +1,48 @@
+@prefix just: <http://interior-minister.gub.uy/ontology/justice#> .
+@prefix crime: <http://interior-minister.gub.uy/ontology/crime#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+# Classes
+just:Measure a owl:Class ;
+    rdfs:label "Alternative Measure" ;
+    rdfs:comment "Non-incarceration sentencing measure" .
+
+just:MonitoringProgram a owl:Class ;
+    rdfs:label "Monitoring Program" ;
+    rdfs:comment "Electronic monitoring or supervision program" .
+
+# Measure type instances
+just:ArrestoDomiciliario a just:Measure ; rdfs:label "Arresto domiciliario" .
+just:Cautelar a just:Measure ; rdfs:label "Cautelar" .
+just:LibertadAPrueba a just:Measure ; rdfs:label "Libertad a prueba" .
+just:LibertadVigilada a just:Measure ; rdfs:label "Libertad vigilada" .
+just:PrisionDomiciliaria a just:Measure ; rdfs:label "Prisión domiciliaria" .
+just:SuspensionCondicional a just:Measure ; rdfs:label "Suspensión condicional del proceso" .
+just:TareaComunitaria a just:Measure ; rdfs:label "Tarea comunitaria" .
+
+# Monitoring
+just:Tobillera a just:MonitoringProgram ; rdfs:label "Tobillera electrónica" .
+
+# Properties
+just:sentencedTo a owl:ObjectProperty ;
+    rdfs:domain crime:Person .
+
+just:assignedMeasure a owl:ObjectProperty ;
+    rdfs:domain crime:Person ;
+    rdfs:range just:Measure .
+
+just:monitoredBy a owl:ObjectProperty ;
+    rdfs:domain crime:Person ;
+    rdfs:range just:MonitoringProgram .
+
+just:escalatedTo a owl:ObjectProperty ;
+    rdfs:domain crime:Incident ;
+    rdfs:range crime:Incident ;
+    rdfs:comment "Links a DV incident to a more severe outcome (homicide)" .
+
+just:measureType a owl:DatatypeProperty ;
+    rdfs:domain just:Measure .
+
+just:controlMethod a owl:DatatypeProperty ;
+    rdfs:domain just:Measure .

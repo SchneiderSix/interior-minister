@@ -1,0 +1,63 @@
+@prefix loc: <http://interior-minister.gub.uy/ontology/location#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+# Classes
+loc:Department a owl:Class ;
+    rdfs:label "Department" ;
+    rdfs:comment "One of Uruguay's 19 departments" .
+
+loc:Seccional a owl:Class ;
+    rdfs:label "Seccional Policial" ;
+    rdfs:comment "Police precinct area" .
+
+loc:FacilityPolice a owl:Class ;
+    rdfs:label "Police Facility" ;
+    rdfs:comment "Police station or headquarters" .
+
+loc:FacilityFire a owl:Class ;
+    rdfs:label "Fire Station" ;
+    rdfs:comment "Fire department outpost" .
+
+loc:FacilityPrison a owl:Class ;
+    rdfs:label "Prison Facility" ;
+    rdfs:comment "Penitentiary establishment" .
+
+loc:FacilityCevdg a owl:Class ;
+    rdfs:label "CEVDG" ;
+    rdfs:comment "Specialized domestic violence and gender police station" .
+
+# Properties
+loc:belongsTo a owl:ObjectProperty ;
+    rdfs:domain loc:Seccional ;
+    rdfs:range loc:Department .
+
+loc:locatedIn a owl:ObjectProperty ;
+    rdfs:comment "Facility located in a department or seccional" .
+
+loc:servesArea a owl:ObjectProperty ;
+    rdfs:comment "Facility serves a geographic area" .
+
+loc:latitude a owl:DatatypeProperty .
+loc:longitude a owl:DatatypeProperty .
+
+# Department instances (all 19)
+loc:Montevideo a loc:Department ; rdfs:label "Montevideo" .
+loc:Artigas a loc:Department ; rdfs:label "Artigas" .
+loc:Canelones a loc:Department ; rdfs:label "Canelones" .
+loc:CerroLargo a loc:Department ; rdfs:label "Cerro Largo" .
+loc:Colonia a loc:Department ; rdfs:label "Colonia" .
+loc:Durazno a loc:Department ; rdfs:label "Durazno" .
+loc:Flores a loc:Department ; rdfs:label "Flores" .
+loc:Florida a loc:Department ; rdfs:label "Florida" .
+loc:Lavalleja a loc:Department ; rdfs:label "Lavalleja" .
+loc:Maldonado a loc:Department ; rdfs:label "Maldonado" .
+loc:Paysandu a loc:Department ; rdfs:label "Paysandú" .
+loc:RioNegro a loc:Department ; rdfs:label "Río Negro" .
+loc:Rivera a loc:Department ; rdfs:label "Rivera" .
+loc:Rocha a loc:Department ; rdfs:label "Rocha" .
+loc:Salto a loc:Department ; rdfs:label "Salto" .
+loc:SanJose a loc:Department ; rdfs:label "San José" .
+loc:Soriano a loc:Department ; rdfs:label "Soriano" .
+loc:Tacuarembo a loc:Department ; rdfs:label "Tacuarembó" .
+loc:TreintayTres a loc:Department ; rdfs:label "Treinta y Tres" .

@@ -1,0 +1,34 @@
+# Credentials
+credentials.json
+.bruin.yml
+*.pem
+*.key
+
+# Data (downloaded/processed locally)
+data/
+
+# Python
+*.pyc
+__pycache__/
+*.egg-info/
+.venv/
+dist/
+build/
+
+# Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+*.tfplan
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Notebooks checkpoints
+.ipynb_checkpoints/

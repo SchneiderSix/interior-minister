@@ -1,0 +1,10 @@
+name: interior_minister
+schedule: "weekly"
+
+default_connections:
+  google_cloud_platform: "gcp-interior-minister"
+
+variables:
+  gcs_bucket: "interior-minister-data-lake-fabled-imagery-488015-p6"
+  ckan_base_url: "https://catalogodatos.gub.uy/api/3/action"
+  ckan_org: "tic-ministerio-del-interior"

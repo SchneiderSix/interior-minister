@@ -1,0 +1,50 @@
+[project]
+name = "interior-minister-pipeline"
+version = "0.1.0"
+description = "Neuro-symbolic data pipeline for Uruguay Interior Ministry open data"
+requires-python = ">=3.11"
+dependencies = [
+    "polars==1.24.0",
+    "pyarrow==18.1.0",
+    "httpx==0.28.1",
+    "google-cloud-storage==2.19.0",
+    "google-cloud-bigquery==3.27.0",
+    "geopandas==1.1.2",
+    "shapely==2.0.6",
+    "pyproj==3.7.0",
+    "fiona==1.10.1",
+    "rdflib==7.1.1",
+    "networkx==3.4.2",
+    "z3-solver==4.13.3.0",
+    "duckdb==1.1.3",
+    "openpyxl==3.1.5",
+    "lxml==6.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pip-audit==2.8.0",
+    "ruff==0.9.7",
+]
+ml = [
+    "torch==2.5.1",
+    "torch-geometric==2.6.1",
+    "transformers==4.47.1",
+]
+
+[dependency-groups]
+dev = [
+    "pip-audit==2.8.0",
+    "ruff==0.9.7",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/interior_minister"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
