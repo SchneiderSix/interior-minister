@@ -1,6 +1,6 @@
 # Uruguay Interior Ministry — Neuro-Symbolic Crime Data Pipeline
 
-End-to-end neuro-symbolic data pipeline for Uruguay's Interior Ministry open data. Combines traditional data engineering with **knowledge graphs**, **formal verification (Z3)**, **LLM-based entity linking (Qwen2.5-7B)**, and **GNN crime prediction** with symbolic rules. Built as a capstone project for the [DataTalksClub Data Engineering Zoomcamp](https://github.com/DataTalksClub/data-engineering-zoomcamp).
+End-to-end neuro-symbolic data pipeline for Uruguay's Interior Ministry open data. Combines traditional data engineering with **knowledge graphs**, **formal verification (Z3)**, **LLM-based entity linking (Qwen2.5-7B)**, and **GNN crime prediction** with symbolic rules.
 
 ## Problem Description
 
