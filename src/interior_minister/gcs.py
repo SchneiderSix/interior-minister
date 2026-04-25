@@ -13,7 +13,15 @@ DEFAULT_BUCKET = os.environ.get(
 
 
 def get_client() -> storage.Client:
-    """Create a GCS client using application default credentials."""
+    """Create a GCS client, preferring service account credentials if available."""
+    # Look for credentials.json relative to the project root
+    creds_candidates = [
+        Path(__file__).resolve().parents[2] / "credentials.json",
+        Path.cwd() / "credentials.json",
+    ]
+    for creds_path in creds_candidates:
+        if creds_path.exists():
+            return storage.Client.from_service_account_json(str(creds_path))
     return storage.Client()
 
 

@@ -32,7 +32,7 @@ DATASET_SCHEMAS: dict[str, dict] = {
         "description": "Reported crimes including homicides, robberies, injuries, DV, theft, cattle rustling",
         "time_range": (2013, 2025),
         "key_columns": [
-            "anio", "mes", "trimestre", "departamento", "seccional",
+            "ano", "mes", "trimestre", "departamento", "seccional",
             "titulo", "subtitulo",
         ],
         "date_columns": ["fecha"],
@@ -44,7 +44,7 @@ DATASET_SCHEMAS: dict[str, dict] = {
         "description": "Domestic violence reports, victims, and electronic ankle bracelet program",
         "time_range": (2020, 2024),
         "key_columns": [
-            "anio", "departamento", "titulo", "jurisdiccion",
+            "ano", "departamento", "titulo", "jurisdiccion",
             "sexo_victima", "sexo_agresor",
         ],
         "date_columns": ["fecha_denuncia"],
@@ -56,7 +56,7 @@ DATASET_SCHEMAS: dict[str, dict] = {
         "description": "Major sexual crimes reported",
         "time_range": (2018, 2024),
         "key_columns": [
-            "anio", "departamento", "jurisdiccion", "titulo",
+            "ano", "departamento", "jurisdiccion", "titulo",
             "sexo_victima",
         ],
         "date_columns": ["fecha_denuncia"],
@@ -68,7 +68,7 @@ DATASET_SCHEMAS: dict[str, dict] = {
         "description": "Homicides against women (domestic and gender-based violence)",
         "time_range": (2017, 2024),
         "key_columns": [
-            "anio", "departamento", "vinculo",
+            "ano", "departamento", "vinculo",
         ],
         "date_columns": ["fecha"],
         "categorical": {
@@ -79,7 +79,7 @@ DATASET_SCHEMAS: dict[str, dict] = {
         "description": "Alternative measures to incarceration",
         "time_range": (2018, 2025),
         "key_columns": [
-            "anio", "mes", "departamento", "tipo_medida", "genero",
+            "ano", "mes", "departamento", "tipo_medida", "genero",
         ],
         "date_columns": [],
         "categorical": {
@@ -90,12 +90,17 @@ DATASET_SCHEMAS: dict[str, dict] = {
         "description": "Prison system population and demographics",
         "time_range": (2018, 2025),
         "key_columns": [
-            "anio", "mes", "establecimiento", "sexo", "grupo_edad",
+            "ano", "mes", "establecimiento", "sexo", "grupo_edad",
         ],
         "date_columns": [],
         "categorical": {},
     },
 }
+
+
+def normalize_department_series(values: list[str]) -> list[str]:
+    """Normalize a list of department values to canonical form. For use with Polars map."""
+    return [normalize_department(v) if v else v for v in values]
 
 
 def validate_year_range(year: int, dataset: str) -> bool:
@@ -110,3 +115,40 @@ def validate_year_range(year: int, dataset: str) -> bool:
 def validate_department(name: str) -> bool:
     """Check if a department name is valid."""
     return name.upper() in {d.upper() for d in DEPARTMENTS.values()}
+
+
+# Mapping of known typos/variants to canonical uppercase department names
+_DEPARTMENT_FIXES: dict[str, str] = {
+    "MALDONDADO": "MALDONADO",
+    "TACUEREMBO": "TACUAREMBO",
+    "PAYSAND\xda": "PAYSANDU",        # Paysandú
+    "SAN JOS\xc9": "SAN JOSE",        # San José
+    "TACUAREMB\xd3": "TACUAREMBO",    # Tacuarembó
+    "R\xcdO NEGRO": "RIO NEGRO",      # Río Negro
+}
+
+# Build lookup: uppercase canonical name for each department
+_CANONICAL_DEPARTMENTS: dict[str, str] = {
+    d.upper(): d.upper() for d in DEPARTMENTS.values()
+}
+_CANONICAL_DEPARTMENTS.update(_DEPARTMENT_FIXES)
+
+
+def normalize_department(name: str) -> str:
+    """Normalize a department name to canonical uppercase form.
+
+    Handles typos (MALDONDADO), accented chars (Paysandú), and mixed case.
+    """
+    import unicodedata
+
+    upper = name.strip().upper()
+    # Try direct lookup first (handles typos like MALDONDADO)
+    if upper in _CANONICAL_DEPARTMENTS:
+        return _CANONICAL_DEPARTMENTS[upper]
+    # Strip accents and retry
+    nfkd = unicodedata.normalize("NFKD", upper)
+    stripped = "".join(c for c in nfkd if not unicodedata.combining(c))
+    if stripped in _CANONICAL_DEPARTMENTS:
+        return _CANONICAL_DEPARTMENTS[stripped]
+    # Return accent-stripped uppercase as best effort
+    return stripped

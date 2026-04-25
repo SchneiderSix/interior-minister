@@ -56,7 +56,14 @@ def upload_directory(
 
 def main() -> None:
     bucket_name = get_bucket_name()
-    client = storage.Client()
+
+    # Use service account credentials if available
+    creds_path = PROJECT_ROOT / "credentials.json"
+    if creds_path.exists():
+        client = storage.Client.from_service_account_json(str(creds_path))
+    else:
+        client = storage.Client()
+
     bucket = client.bucket(bucket_name)
 
     total_uploaded = 0

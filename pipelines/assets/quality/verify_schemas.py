@@ -67,7 +67,7 @@ def _validate_dataset(path: Path) -> list[ConstraintResult]:
         has_valid_departments = dept_result.satisfied
 
     # --- year check ---
-    year_col = _find_column(df, ["anio", "año", "year"])
+    year_col = _find_column(df, ["ano", "anio", "año", "year"])
     has_valid_years = True
     if year_col is not None:
         year_values = df[year_col].drop_nulls().cast(int).to_list()
@@ -142,7 +142,8 @@ def main() -> None:
             if not r.satisfied:
                 all_passed = False
                 for v in r.violations[:5]:
-                    print(f"        ! {v}")
+                    safe_v = str(v).encode("ascii", errors="replace").decode("ascii")
+                    print(f"        ! {safe_v}")
 
     print("\n" + "=" * 70)
     print(f"OVERALL: {'ALL PASSED' if all_passed else 'VIOLATIONS DETECTED'}")

@@ -40,39 +40,30 @@ destroy:
 # --- Pipeline Stages ---
 
 ingest:
-	bruin run --tag ingestion pipelines/
+	USERPROFILE="$(HOME)" bruin run --tag ingestion pipelines/
 
 transform:
-	bruin run --tag transformation pipelines/
+	USERPROFILE="$(HOME)" bruin run --tag transformation pipelines/
 
 verify:
-	bruin run --tag quality pipelines/
+	USERPROFILE="$(HOME)" bruin run --tag quality pipelines/
 
 graph:
-	bruin run --tag knowledge_graph pipelines/
+	USERPROFILE="$(HOME)" bruin run --tag knowledge_graph pipelines/
 
 run:
-	bruin run pipelines/
+	USERPROFILE="$(HOME)" bruin run pipelines/
 
 # --- BigQuery ---
 
 bq-create-sources:
-	$(BQ) mk --external_table_definition='gs://$(BUCKET)/processed/tabular/delitos_denunciados.parquet@PARQUET' \
-		$(GCP_PROJECT_ID):interior_minister.raw_delitos || true
-	$(BQ) mk --external_table_definition='gs://$(BUCKET)/processed/tabular/violencia_domestica.parquet@PARQUET' \
-		$(GCP_PROJECT_ID):interior_minister.raw_violencia_domestica || true
-	$(BQ) mk --external_table_definition='gs://$(BUCKET)/processed/tabular/delitos_sexuales.parquet@PARQUET' \
-		$(GCP_PROJECT_ID):interior_minister.raw_delitos_sexuales || true
-	$(BQ) mk --external_table_definition='gs://$(BUCKET)/processed/tabular/homicidios_mujeres.parquet@PARQUET' \
-		$(GCP_PROJECT_ID):interior_minister.raw_homicidios_mujeres || true
-	$(BQ) mk --external_table_definition='gs://$(BUCKET)/processed/tabular/medidas_alternativas.parquet@PARQUET' \
-		$(GCP_PROJECT_ID):interior_minister.raw_medidas_alternativas || true
-	$(BQ) mk --external_table_definition='gs://$(BUCKET)/processed/tabular/sistema_carcelario.parquet@PARQUET' \
-		$(GCP_PROJECT_ID):interior_minister.raw_sistema_carcelario || true
-	@echo "Source tables created in BigQuery"
+	uv run python scripts/create_bq_sources.py
 
 bq-tables:
-	$(BQ) ls $(GCP_PROJECT_ID):interior_minister
+	uv run python -c "from google.cloud import bigquery; from google.oauth2 import service_account; \
+		creds = service_account.Credentials.from_service_account_file('credentials.json'); \
+		c = bigquery.Client(project='$(GCP_PROJECT_ID)', credentials=creds); \
+		[print(t.table_id) for t in c.list_tables('$(GCP_PROJECT_ID).interior_minister')]"
 
 clean:
 	rm -rf data/raw data/processed

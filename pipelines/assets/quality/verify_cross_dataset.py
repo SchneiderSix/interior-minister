@@ -46,8 +46,8 @@ def check_dv_subset_consistency() -> list[str]:
         issues.append("SKIP: delitos_denunciados or violencia_domestica not found")
         return issues
 
-    year_col_delitos = _find_column(delitos, ["anio", "año", "year"])
-    year_col_vd = _find_column(vd, ["anio", "año", "year"])
+    year_col_delitos = _find_column(delitos, ["ano", "anio", "año", "year"])
+    year_col_vd = _find_column(vd, ["ano", "anio", "año", "year"])
     if year_col_delitos is None or year_col_vd is None:
         issues.append("SKIP: year column not found in one of the datasets")
         return issues
@@ -99,8 +99,8 @@ def check_female_homicides_subset() -> list[str]:
         issues.append("SKIP: delitos_denunciados or homicidios_mujeres not found")
         return issues
 
-    year_col_d = _find_column(delitos, ["anio", "año", "year"])
-    year_col_h = _find_column(hom_mujeres, ["anio", "año", "year"])
+    year_col_d = _find_column(delitos, ["ano", "anio", "año", "year"])
+    year_col_h = _find_column(hom_mujeres, ["ano", "anio", "año", "year"])
     if year_col_d is None or year_col_h is None:
         issues.append("SKIP: year column not found")
         return issues
@@ -146,8 +146,8 @@ def check_corrections_total() -> list[str]:
         issues.append("SKIP: sistema_carcelario or medidas_alternativas not found")
         return issues
 
-    year_col_p = _find_column(prison, ["anio", "año", "year"])
-    year_col_a = _find_column(alt, ["anio", "año", "year"])
+    year_col_p = _find_column(prison, ["ano", "anio", "año", "year"])
+    year_col_a = _find_column(alt, ["ano", "anio", "año", "year"])
     if year_col_p is None or year_col_a is None:
         issues.append("SKIP: year column not found")
         return issues
@@ -175,7 +175,7 @@ def check_temporal_gaps() -> list[str]:
 
     for pq_path in sorted(PROCESSED_DIR.glob("*.parquet")):
         df = pl.read_parquet(pq_path)
-        year_col = _find_column(df, ["anio", "año", "year"])
+        year_col = _find_column(df, ["ano", "anio", "año", "year"])
         month_col = _find_column(df, ["mes", "month"])
 
         if year_col is None or month_col is None:

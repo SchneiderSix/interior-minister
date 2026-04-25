@@ -57,7 +57,8 @@ def _stable_id(*parts: str | int | None) -> str:
 def _ingest_crime_data(g, nx_graph: nx.DiGraph) -> int:
     """Ingest crime incident data from processed parquet files."""
     crime_datasets = [
-        "delitos_denunciados",
+        "delitos_denuncias",
+        "delitos_homicidios",
         "violencia_domestica",
         "delitos_sexuales",
         "homicidios_mujeres",
@@ -71,11 +72,11 @@ def _ingest_crime_data(g, nx_graph: nx.DiGraph) -> int:
             continue
 
         df = pl.read_parquet(path)
-        year_col = _find_column(df, ["anio", "año", "year"])
+        year_col = _find_column(df, ["anio", "ano", "año", "year"])
         month_col = _find_column(df, ["mes", "month"])
-        dept_col = _find_column(df, ["departamento", "departamento_nombre"])
-        secc_col = _find_column(df, ["seccional"])
-        type_col = _find_column(df, ["titulo", "subtitulo", "tipo_delito"])
+        dept_col = _find_column(df, ["departamento", "departamento_nombre", "depto"])
+        secc_col = _find_column(df, ["seccional", "jurisdiccion"])
+        type_col = _find_column(df, ["titulo", "subtitulo", "tipo_delito", "delito"])
 
         if year_col is None or dept_col is None:
             print(f"  SKIP: {ds_name} missing year or department column")
@@ -135,15 +136,27 @@ def _ingest_geographic_data(g, nx_graph: nx.DiGraph) -> int:
 
     geo_files = list(PROCESSED_GEO.glob("*.parquet")) if PROCESSED_GEO.exists() else []
     for geo_path in sorted(geo_files):
-        df = pl.read_parquet(geo_path)
+        # GeoParquet uses geoarrow extension types that Polars doesn't support.
+        # Read with pyarrow first, drop geometry columns, then convert to Polars.
+        import pyarrow.parquet as pq
+
+        table = pq.read_table(geo_path)
+        # Drop columns with unsupported extension types (geometry/wkb)
+        drop_cols = [
+            f.name for f in table.schema
+            if "geoarrow" in str(f.type) or f.name == "geometry"
+        ]
+        if drop_cols:
+            table = table.drop(drop_cols)
+        df = pl.from_arrow(table)
         name_col = _find_column(df, ["nombre", "name", "establecimiento", "denominacion"])
         lat_col = _find_column(df, ["latitud", "latitude", "lat", "y"])
         lon_col = _find_column(df, ["longitud", "longitude", "lon", "lng", "x"])
-        dept_col = _find_column(df, ["departamento", "departamento_nombre"])
+        dept_col = _find_column(df, ["departamento", "departamento_nombre", "departamen", "depto", "dpto"])
 
         # Determine facility type from filename
         stem = geo_path.stem.lower()
-        if "policia" in stem or "comisaria" in stem or "seccional" in stem:
+        if "policia" in stem or "comisaria" in stem or "seccional" in stem or "jefatura" in stem:
             facility_type = "police"
         elif "bombero" in stem or "fire" in stem:
             facility_type = "fire"

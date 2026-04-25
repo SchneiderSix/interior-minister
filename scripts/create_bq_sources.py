@@ -1,7 +1,9 @@
 """Create BigQuery external tables from GCS Parquet files."""
 
-import sys
+from pathlib import Path
+
 from google.cloud import bigquery
+from google.oauth2 import service_account
 
 PROJECT_ID = "fabled-imagery-488015-p6"
 DATASET_ID = "interior_minister"
@@ -17,7 +19,12 @@ TABLES = {
 }
 
 def main():
-    client = bigquery.Client(project=PROJECT_ID)
+    creds_path = Path(__file__).resolve().parents[1] / "credentials.json"
+    if creds_path.exists():
+        credentials = service_account.Credentials.from_service_account_file(str(creds_path))
+        client = bigquery.Client(project=PROJECT_ID, credentials=credentials)
+    else:
+        client = bigquery.Client(project=PROJECT_ID)
     for table_name, gcs_path in TABLES.items():
         table_id = f"{PROJECT_ID}.{DATASET_ID}.{table_name}"
         source_uri = f"gs://{BUCKET}/{gcs_path}"

@@ -5,6 +5,12 @@ default_connections:
   google_cloud_platform: "gcp-interior-minister"
 
 variables:
-  gcs_bucket: "interior-minister-data-lake-fabled-imagery-488015-p6"
-  ckan_base_url: "https://catalogodatos.gub.uy/api/3/action"
-  ckan_org: "tic-ministerio-del-interior"
+  gcs_bucket:
+    type: string
+    default: "interior-minister-data-lake-fabled-imagery-488015-p6"
+  ckan_base_url:
+    type: string
+    default: "https://catalogodatos.gub.uy/api/3/action"
+  ckan_org:
+    type: string
+    default: "tic-ministerio-del-interior"

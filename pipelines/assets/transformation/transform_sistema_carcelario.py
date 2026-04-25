@@ -8,6 +8,7 @@ depends:
 description: Transform sistema_carcelario dataset to normalized Parquet
 @bruin """
 
+import unicodedata
 from pathlib import Path
 
 import polars as pl
@@ -18,31 +19,43 @@ OUT_PATH = Path(__file__).resolve().parents[3] / "data" / "processed" / "tabular
 
 
 def normalize_columns(df: pl.DataFrame) -> pl.DataFrame:
-    """Strip whitespace, lowercase, replace spaces with underscores."""
-    rename_map = {
-        col: col.strip().lower().replace(" ", "_")
-        for col in df.columns
-    }
+    """Strip whitespace, lowercase, replace spaces with underscores, strip accents."""
+    def _normalize(name: str) -> str:
+        name = name.strip().lower().replace(" ", "_")
+        nfkd = unicodedata.normalize("NFKD", name)
+        return "".join(c for c in nfkd if not unicodedata.combining(c))
+
+    rename_map = {col: _normalize(col) for col in df.columns}
     return df.rename(rename_map)
 
 
 def read_csv_safe(path: Path) -> pl.DataFrame:
-    """Read CSV with comma separator, fallback to semicolon with latin-1."""
+    """Read CSV with proper encoding detection (UTF-8 → Latin-1 fallback)."""
+    raw = path.read_bytes()
     try:
-        return pl.read_csv(
-            path,
-            separator=",",
-            infer_schema_length=10000,
-            ignore_errors=True,
-        )
-    except Exception:
-        return pl.read_csv(
-            path,
-            separator=";",
-            encoding="utf8-lossy",
-            infer_schema_length=10000,
-            ignore_errors=True,
-        )
+        content = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        content = raw.decode("latin-1")
+    utf8_bytes = content.encode("utf-8")
+
+    for sep in (",", ";"):
+        try:
+            df = pl.read_csv(
+                utf8_bytes,
+                separator=sep,
+                infer_schema_length=10000,
+                ignore_errors=True,
+            )
+            if len(df.columns) > 1:
+                return df
+        except Exception:
+            continue
+    return pl.read_csv(
+        utf8_bytes,
+        separator=";",
+        infer_schema_length=10000,
+        ignore_errors=True,
+    )
 
 
 def read_file(path: Path) -> pl.DataFrame:
@@ -57,15 +70,24 @@ def read_file(path: Path) -> pl.DataFrame:
 
 
 def parse_date_columns(df: pl.DataFrame) -> pl.DataFrame:
-    """Attempt to parse columns whose name contains 'fecha' or 'date' as Date."""
+    """Try to parse date columns with known formats, skip on failure."""
     date_cols = [
         col for col in df.columns
         if any(kw in col for kw in ("fecha", "date", "periodo"))
     ]
     for col in date_cols:
-        df = df.with_columns(
-            pl.col(col).cast(pl.Utf8).str.to_date(strict=False).alias(col)
-        )
+        parsed = False
+        for fmt in ("%d.%m.%Y", "%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"):
+            try:
+                df = df.with_columns(
+                    pl.col(col).cast(pl.Utf8).str.to_date(fmt, strict=False).alias(col)
+                )
+                parsed = True
+                break
+            except Exception:
+                continue
+        if not parsed:
+            print(f"  Warning: could not parse date column '{col}', keeping as string")
     return df
 
 

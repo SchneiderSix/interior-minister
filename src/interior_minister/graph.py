@@ -51,7 +51,7 @@ def add_incident(
     g.add((node, CRIME.reportedAt, dept_node))
 
     if seccional:
-        secc_node = LOC[f"seccional/{seccional}"]
+        secc_node = LOC[f"seccional/{seccional.replace(' ', '_')}"]
         g.add((node, CRIME.reportedAt, secc_node))
         g.add((secc_node, LOC.belongsTo, dept_node))
 

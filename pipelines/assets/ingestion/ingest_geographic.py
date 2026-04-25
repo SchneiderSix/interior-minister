@@ -27,23 +27,23 @@ RAW_DIR = PROJECT_ROOT / "data" / "raw" / "geographic"
 GEOGRAPHIC_DATASETS: dict[str, dict] = {
     "seccionales": {
         "slug": "tic-ministerio-del-interior-seccionales-policiales",
-        "prefer": "SHP",
+        "prefer": "KML",  # SHP is RAR, not ZIP
     },
     "comisarias": {
-        "slug": "comisarias",
-        "prefer": "SHP",
-    },
-    "jefaturas": {
-        "slug": "tic-ministerio-del-interior-jefaturas",
-        "prefer": "KML",  # RAR archive for SHP; use KML fallback
+        "slug": "tic-ministerio-del-interior-comisarias-uruguay",
+        "prefer": "KML",  # SHP is RAR, not ZIP
     },
     "bomberos": {
         "slug": "tic-ministerio-del-interior-destacamentos-d-n-b",
-        "prefer": "SHP",
+        "prefer": "SHP",  # Only dataset with ZIP archive
     },
     "cevdg": {
         "slug": "tic-ministerio-del-interior-uevdg",
-        "prefer": "SHP",
+        "prefer": "KML",  # SHP is RAR, not ZIP
+    },
+    "jefaturas": {
+        "slug": "tic-ministerio-del-interior-jefaturas",
+        "prefer": "KML",  # SHP is RAR, not ZIP
     },
 }
 

@@ -20,6 +20,7 @@ build/
 terraform.tfstate
 terraform.tfstate.backup
 *.tfplan
+terraform.tfvars
 
 # IDE
 .idea/
@@ -32,3 +33,15 @@ Thumbs.db
 
 # Notebooks checkpoints
 .ipynb_checkpoints/
+
+# Logs
+logs/
+
+# Claude / analysis docs (not part of the project)
+CLAUDE.md
+claudedocs/
+catalog_analysis.md
+knowledge_graph_explained.md
+
+# MCP servers
+.playwright-mcp/
